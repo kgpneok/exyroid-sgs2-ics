@@ -197,10 +197,11 @@ static void android_work(struct work_struct *data)
 
 	if (uevent_envp) {
 		kobject_uevent_env(&dev->dev->kobj, KOBJ_CHANGE, uevent_envp);
-		pr_info("%s: sent uevent %s\n", __func__, uevent_envp[0]);
+		printk(KERN_DEBUG "usb: %s sent uevent %s\n",
+			 __func__, uevent_envp[0]);
 	} else {
-		pr_info("%s: did not send uevent (%d %d %p)\n", __func__,
-			 dev->connected, dev->sw_connected, cdev->config);
+		printk(KERN_DEBUG "usb: %s did not send uevent (%d %d %p)\n",
+		 __func__, dev->connected, dev->sw_connected, cdev->config);
 	}
 }
 
@@ -612,6 +613,7 @@ static int mass_storage_function_init(struct android_usb_function *f,
 			if (err == 0) {
 				printk(KERN_ERR "usb: %s snprintf error\n",
 						__func__);
+				kfree(config);
 				return err;
 			}
 			err = sysfs_create_link(&f->dev->kobj,
@@ -1366,14 +1368,25 @@ static void android_disconnect(struct usb_gadget *gadget)
 	spin_lock_irqsave(&cdev->lock, flags);
 	dev->connected = 0;
 #ifdef CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE
+	printk(KERN_DEBUG "usb: %s con(%d), sw(%d)\n",
+		 __func__, dev->connected, dev->sw_connected);
 	/* avoid sending a disconnect switch event
 	 * until after we disconnect.
 	 */
 	if (cdev->mute_switch) {
-		printk(KERN_DEBUG "usb: %s mute_switch\n", __func__);
+		dev->sw_connected = dev->connected;
+		printk(KERN_DEBUG "usb: %s mute_switch con(%d) sw(%d)\n",
+			 __func__, dev->connected, dev->sw_connected);
 	} else {
 		set_ncm_ready(false);
-		printk(KERN_DEBUG "usb: %s schedule_work\n", __func__);
+		if (cdev->force_disconnect) {
+			dev->sw_connected = 1;
+			printk(KERN_DEBUG "usb: %s force_disconnect\n",
+				 __func__);
+			cdev->force_disconnect = 0;
+		}
+		printk(KERN_DEBUG "usb: %s schedule_work con(%d) sw(%d)\n",
+			 __func__, dev->connected, dev->sw_connected);
 		schedule_work(&dev->work);
 	}
 #else

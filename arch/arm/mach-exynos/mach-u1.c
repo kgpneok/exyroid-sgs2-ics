@@ -4149,13 +4149,8 @@ static void mxt224_power_off(void)
 #define MXT224_THRESHOLD_BATT		40
 #define MXT224_THRESHOLD_BATT_INIT		55
 #define MXT224_THRESHOLD_CHRG		70
-#ifndef CONFIG_TARGET_LOCALE_KOR
-#define MXT224_NOISE_THRESHOLD_BATT		15
-#define MXT224_NOISE_THRESHOLD_CHRG		40
-#else
 #define MXT224_NOISE_THRESHOLD_BATT		30
 #define MXT224_NOISE_THRESHOLD_CHRG		40
-#endif
 #define MXT224_MOVFILTER_BATT		11
 #define MXT224_MOVFILTER_CHRG		47
 #define MXT224_ATCHCALST		4
@@ -4187,17 +4182,11 @@ static u8 t20_config[] = { PROCI_GRIPFACESUPPRESSION_T20,
 	7, 0, 0, 0, 0, 0, 0, 30, 20, 4, 15, 10
 };
 
-#ifndef CONFIG_TARGET_LOCALE_KOR
-static u8 t22_config[] = { PROCG_NOISESUPPRESSION_T22,
-	143, 0, 0, 0, 0, 0, 0, 3, MXT224_NOISE_THRESHOLD_BATT, 0,
-	0, 10, 12, 18, 20, 29, 3
-};
-#else
 static u8 t22_config[] = { PROCG_NOISESUPPRESSION_T22,
 	143, 0, 0, 0, 0, 0, 0, 3, MXT224_NOISE_THRESHOLD_BATT, 0,
 	0, 29, 34, 39, 49, 58, 3
 };
-#endif
+
 static u8 t28_config[] = { SPT_CTECONFIG_T28,
 			   0, 0, 3, 16, 19, 60
 };
@@ -4711,11 +4700,7 @@ static u8 t55_config_e[] = {ADAPTIVE_T55,
 };
 
 static u8 t57_config_e[] = {SPT_GENERICDATA_T57,
-	243, 25, 1
-};
-
-static u8 t61_config_e[] = {SPT_TIMER_T61,
-	0, 0, 0, 0, 0
+	131, 25, 0
 };
 
 static u8 end_config_e[] = { RESERVED_T255 };
@@ -4739,7 +4724,6 @@ static const u8 *mxt540e_config[] = {
 	t52_config_e,
 	t55_config_e,
 	t57_config_e,
-	t61_config_e,
 	end_config_e,
 };
 

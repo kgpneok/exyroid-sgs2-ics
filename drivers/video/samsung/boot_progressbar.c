@@ -59,6 +59,7 @@ static struct timer_list progress_timer;
 #define PROGRESS_BAR_LEFT_POS	    54
 #define PROGRESS_BAR_RIGHT_POS	   (425-PROGRESS_BAR_WIDTH)
 #define PROGRESS_BAR_START_Y	    576
+#define PROGRESS_DRAW_EXPIRES	    (get_jiffies_64() + 7)
 
 static unsigned char anycall_progress_bar_left[] = {
 0x33, 0x33, 0x33, 0x00, 0x33, 0x33, 0x33, 0x00,
@@ -192,7 +193,7 @@ void s3cfb_start_progress(struct fb_info *fb)
 
 	init_timer(&progress_timer);
 
-	progress_timer.expires  = (get_jiffies_64() + (HZ/20));
+	progress_timer.expires  = PROGRESS_DRAW_EXPIRES;
 	progress_timer.data     = (long)fb;
 	progress_timer.function = progress_timer_handler;
 	progress_pos = PROGRESS_BAR_LEFT_POS;
@@ -257,7 +258,7 @@ static void progress_timer_handler(unsigned long data)
 		PROGRESS_BAR_WIDTH,
 		PROGRESS_BAR_HEIGHT);
 
-		progress_timer.expires = (get_jiffies_64() + (HZ/20));
+		progress_timer.expires = PROGRESS_DRAW_EXPIRES;
 		progress_timer.function = progress_timer_handler;
 		add_timer(&progress_timer);
 	} else
