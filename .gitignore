@@ -120,4 +120,7 @@ scripts/genksyms/parse.h
 scripts/kconfig/lex.zconf.c
 scripts/kconfig/zconf.hash.c
 scripts/kconfig/zconf.tab.c
+drivers/tty/vt/consolemap_deftbl.c
+drivers/tty/vt/defkeymap.c
+scripts/recordmcount
 
