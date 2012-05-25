@@ -596,6 +596,7 @@ static int exynos_cpufreq_reboot_notifier_call(struct notifier_block *this,
 
 static struct notifier_block exynos_cpufreq_reboot_notifier = {
 	.notifier_call = exynos_cpufreq_reboot_notifier_call,
+	.priority = INT_MIN, /* done last - originally by arighi */
 };
 
 /* Make sure we populate scaling_available_freqs in sysfs - netarchy */
