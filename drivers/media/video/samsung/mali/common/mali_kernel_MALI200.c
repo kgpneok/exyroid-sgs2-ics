@@ -88,7 +88,7 @@ static _mali_osk_errcode_t mali200_subsystem_startup(mali_kernel_subsystem_ident
 #if USING_MMU
 static _mali_osk_errcode_t mali200_subsystem_mmu_connect(mali_kernel_subsystem_identifier id);
 #endif
-//static void mali200_subsystem_terminate(mali_kernel_subsystem_identifier id);
+static void mali200_subsystem_terminate(mali_kernel_subsystem_identifier id);
 static _mali_osk_errcode_t mali200_subsystem_session_begin(struct mali_session_data * mali_session_data, mali_kernel_subsystem_session_slot * slot, _mali_osk_notification_queue_t * queue);
 static void mali200_subsystem_session_end(struct mali_session_data * mali_session_data, mali_kernel_subsystem_session_slot * slot);
 static _mali_osk_errcode_t mali200_subsystem_core_system_info_fill(_mali_system_info* info);
@@ -202,13 +202,11 @@ static _mali_osk_errcode_t mali200_subsystem_mmu_connect(mali_kernel_subsystem_i
 }
 #endif
 
-#if 0
 static void mali200_subsystem_terminate(mali_kernel_subsystem_identifier id)
 {
 	MALI_DEBUG_PRINT(3, ("Mali PP: mali200_subsystem_terminate\n") ) ;
 	mali_core_subsystem_cleanup(&subsystem_mali200);
 }
-#endif
 
 static _mali_osk_errcode_t mali200_subsystem_session_begin(struct mali_session_data * mali_session_data, mali_kernel_subsystem_session_slot * slot, _mali_osk_notification_queue_t * queue)
 {
@@ -855,7 +853,7 @@ static int subsystem_mali200_irq_handler_bottom_half(struct mali_core_renderunit
 		_mali_osk_atomic_inc(&job->session->jobs_ended);
 #endif
 		
-		pr_debug("SPI_GPU_PP%u Idle\n", core->core_number);
+        	pr_debug("SPI_GPU_PP%u Idle\n", core->core_number);
              
 		return JOB_STATUS_END_SUCCESS; /* reschedule */
 	}
