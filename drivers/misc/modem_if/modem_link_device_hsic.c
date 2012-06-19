@@ -395,10 +395,10 @@ static void usb_tx_work(struct work_struct *work)
 				pm_runtime_put(dev);
 				continue;
 			}
-
+#if 0
 			if (iod->format == IPC_FMT && usb_ld->if_usb_is_main)
 				pr_skb("IPC-TX", skb);
-
+#endif
 			usb_mark_last_busy(usb_ld->usbdev);
 			ret = usb_tx_urb_with_skb(usb_ld->usbdev,
 						skb,
