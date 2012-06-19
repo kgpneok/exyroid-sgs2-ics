@@ -373,7 +373,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-gcse -fsingle-precision-constant \
 		   -funswitch-loops \
 		   -fprofile-correction -falign-loops -fgraphite-identity -ftree-loop-distribution \
-		   -fpredictive-commoning \
+		   -fpredictive-commoning -floop-interchange -floop-strip-mine -floop-block \
 		   -pipe -mthumb
 
 KBUILD_AFLAGS_KERNEL :=
