@@ -1092,6 +1092,7 @@ static int max8997_muic_handle_attach(struct max8997_muic_info *info,
 	case ADC_OPEN:
 		switch (chgtyp) {
 		case CHGTYP_USB:
+		case CHGTYP_DOWNSTREAM_PORT:	
 			if (adc == ADC_CEA936ATYPE1_CHG
 					|| adc == ADC_CEA936ATYPE2_CHG) {
 				info->cable_type = CABLE_TYPE_USB;
@@ -1113,7 +1114,6 @@ static int max8997_muic_handle_attach(struct max8997_muic_info *info,
 			}
 			ret = max8997_muic_attach_usb_type(info, adc);
 			break;
-		case CHGTYP_DOWNSTREAM_PORT:
 		case CHGTYP_DEDICATED_CHGR:
 		case CHGTYP_500MA:
 		case CHGTYP_1A:
