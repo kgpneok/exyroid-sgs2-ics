@@ -1974,6 +1974,9 @@ dhd_bus_rxctl(struct dhd_bus *bus, uchar *msg, uint msglen)
 	if (bus->dhd->rxcnt_timeout >= MAX_CNTL_TIMEOUT)
 		return -ETIMEDOUT;
 
+	if (bus->dhd->dongle_trap_occured)
+		return -EREMOTEIO;
+
 	return rxlen ? (int)rxlen : -EIO;
 }
 
@@ -2537,6 +2540,7 @@ dhdsdio_checkdied(dhd_bus_t *bus, char *data, uint size)
 		}
 
 		if (sdpcm_shared.flags & SDPCM_SHARED_TRAP) {
+			bus->dhd->dongle_trap_occured = TRUE;
 			if ((bcmerror = dhdsdio_membytes(bus, FALSE,
 			                                 sdpcm_shared.trap_addr,
 			                                 (uint8*)&tr, sizeof(trap_t))) < 0)

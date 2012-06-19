@@ -2315,8 +2315,8 @@ static bool dhd_check_hang(struct net_device *net, dhd_pub_t *dhdp, int error)
 {
 	if (!dhdp)
 		return FALSE;
-	if ((error == -ETIMEDOUT) || ((dhdp->busstate == DHD_BUS_DOWN) &&
-		(!dhdp->dongle_reset))) {
+	if ((error == -ETIMEDOUT) || (error == -EREMOTEIO) ||
+		((dhdp->busstate == DHD_BUS_DOWN) && (!dhdp->dongle_reset))) {
 		DHD_ERROR(("%s: Event HANG send up due to  re=%d te=%d e=%d s=%d\n", __FUNCTION__,
 			dhdp->rxcnt_timeout, dhdp->txcnt_timeout, error, dhdp->busstate));
 		net_os_send_hang_message(net);
@@ -2646,6 +2646,7 @@ dhd_stop(struct net_device *net)
 #endif /* CUSTOMER_HW_SAMSUNG */
 	}
 #endif /* WL_CFG80211 */
+	dhd->pub.dongle_trap_occured = 0;
 	dhd->pub.hang_was_sent = 0;
 	dhd->pub.rxcnt_timeout = 0;
 	dhd->pub.txcnt_timeout = 0;
@@ -4033,6 +4034,7 @@ dhd_net_attach(dhd_pub_t *dhdp, int ifidx)
 #else
 		net->netdev_ops = &dhd_ops_pri;
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 31) */
+		memcpy(temp_addr, dhd->pub.mac.octet, ETHER_ADDR_LEN);
 	} else {
 		/*
 		 * We have to use the primary MAC for virtual interfaces
