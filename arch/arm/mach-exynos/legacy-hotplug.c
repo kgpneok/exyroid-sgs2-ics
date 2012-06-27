@@ -42,8 +42,8 @@
 #define CPUMON 0
 
 #define CHECK_DELAY	HZ >> 1
-#define TRANS_LOAD_L	25
-#define TRANS_LOAD_H    70
+#define TRANS_LOAD_L	30
+#define TRANS_LOAD_H    75
 #define TRANS_LOAD_L_SCREEN_OFF 80
 #define TRANS_LOAD_H_SCREEN_OFF 1000 //just to make sure that cpu1 is off to help didle
 
