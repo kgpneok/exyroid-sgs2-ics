@@ -214,6 +214,7 @@ char* vol_name_tbl[] = {
 	"AVOL_HP_GAIN",
 };
 
+
 /*
  * Driver private data structure
  */
@@ -1512,7 +1513,7 @@ static int write_reg_vol(struct snd_soc_codec *codec,
 			SINT16 db;
 			sw = (reg < MC1N2_AVOL_MIC1_GAIN) ? (v & 0x80) : 1;
 			vol = sw ? (v & 0x7f) : 0;
-
+			
 			switch (reg)
 			{
 			case MC1N2_DVOL_AD0:
@@ -1609,7 +1610,7 @@ static int write_reg_vol(struct snd_soc_codec *codec,
 				vol = caribrate_vol(reg, vol, mc1n2_carib_AVOL_HP_GAIN);
 				break;
 			}
-
+			
 			db = mc1n2_vreg_map[reg].volmap[vol];
 			//printk(KERN_DEBUG "[MCDRV] update_reg_vol name=%s : volindex=%d, db=%d", vol_name_tbl[reg], vol, db);
 			*vp = db | MCDRV_VOL_UPDATE;
@@ -3714,7 +3715,9 @@ static int mc1n2_hwdep_ioctl_set_path(struct snd_soc_codec *codec,
 		audio_ctrl_mic_bias_gpio(mc1n2->pdata, MAIN_MIC, 0);
 	} else {
 		audio_ctrl_mic_bias_gpio(mc1n2->pdata, MAIN_MIC, 1);
-		mdelay(mc1n2->delay_mic1in);
+		if(mc1n2->delay_mic1in > 0) {
+			msleep(mc1n2->delay_mic1in);
+		}
 	}
 
 	if ((path->asAdc0[0].abSrcOnOff[0] & MCDRV_SRC0_MIC3_OFF) && (path->asAdc0[1].abSrcOnOff[0] & MCDRV_SRC0_MIC3_OFF)) {
@@ -4686,16 +4689,12 @@ static int mc1n2_i2c_remove(struct i2c_client *client)
 	return 0;
 }
 
-#ifdef CONFIG_TARGET_LOCALE_KOR
 /*
  * Function to prevent tick-noise when reboot menu selected.
  * if you have Power-Off sound and same problem, use this function
  */
 static void mc1n2_i2c_shutdown(struct i2c_client *client)
 {
-#ifndef ALSA_VER_ANDROID_3_0
-	struct snd_soc_codec *codec = i2c_get_clientdata(client);
-#endif
 	struct mc1n2_data *mc1n2;
 	int err, i;
 
@@ -4703,15 +4702,7 @@ static void mc1n2_i2c_shutdown(struct i2c_client *client)
 
 	TRACE_FUNC();
 
-#ifdef ALSA_VER_ANDROID_3_0
 	mc1n2 = (struct mc1n2_data *)(i2c_get_clientdata(client));
-#else
-#ifdef ALSA_VER_ANDROID_2_6_35
-	mc1n2 = snd_soc_codec_get_drvdata(codec);
-#else
-	mc1n2 = codec->private_data;
-#endif
-#endif
 
 	mutex_lock(&mc1n2->mutex);
 
@@ -4745,7 +4736,7 @@ static void mc1n2_i2c_shutdown(struct i2c_client *client)
 		err = 0;
 	}
 
-	/* Suepend MCLK */
+	/* Suspend MCLK */
 	mc1n2_set_mclk_source(0);
 
 	pr_info("%s done\n", __func__);
@@ -4758,7 +4749,6 @@ error:
 
 	return;
 }
-#endif
 
 static const struct i2c_device_id mc1n2_i2c_id[] = {
 	{MC1N2_NAME, 0},
@@ -4773,9 +4763,7 @@ static struct i2c_driver mc1n2_i2c_driver = {
 	},
 	.probe = mc1n2_i2c_probe,
 	.remove = mc1n2_i2c_remove,
-#ifdef CONFIG_TARGET_LOCALE_KOR
 	.shutdown = mc1n2_i2c_shutdown,
-#endif
 	.id_table = mc1n2_i2c_id,
 };
 
@@ -4945,6 +4933,14 @@ static ssize_t update_reg_vol(struct device *dev, struct device_attribute *attr,
 }
 
 static DEVICE_ATTR(update_volume, S_IWUGO | S_IRUGO, NULL, update_reg_vol);
+
+void mc1n2_reboot(void)
+{
+	/* Force term */
+	_McDrv_Ctrl(MCDRV_TERM, NULL, 0);
+	/* Force MCLK OFF */
+	mc1n2_set_mclk_source(0);
+}
 
 /*
  * Module init and exit
